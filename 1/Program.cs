@@ -1,5 +1,5 @@
 ﻿// Read all lines, stripping out any blank lines
-var inputFromFile = File.ReadAllLines("..\\..\\..\\input.txt").Where(x => x.Trim() != string.Empty);
+var inputFromFile = File.ReadAllLines("input.txt").Where(x => x.Trim() != string.Empty);
 
 var inputLeftColumn = new List<long>(inputFromFile.Count());
 var inputRightColumn = new List<long>(inputFromFile.Count());

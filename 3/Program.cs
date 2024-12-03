@@ -52,7 +52,7 @@ internal partial class Program
             {
                 case 0:
                     // Calculate the result of the "mul" instruction based on the values in the capture groups
-                    long mulResult = long.Parse(match.Item1.Groups[1].Value) * long.Parse(match.Item1.Groups[2].Value);
+                    long mulResult = long.Parse(match.Item1.Groups[1].ValueSpan) * long.Parse(match.Item1.Groups[2].ValueSpan);
 
                     // Add it to the totals for each part (but only if enabled for P2)
                     totalP1 += mulResult;

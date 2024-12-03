@@ -1,0 +1,3 @@
+[submodule "aoc-2024-bench-data"]
+	path = aoc-2024-bench-data
+	url = git@github.com:Mushroom/aoc-2024-bench-data.git

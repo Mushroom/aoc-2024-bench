@@ -1,34 +1,44 @@
 ﻿using System.Runtime.CompilerServices;
 
-// Read all lines, stripping out any blank lines
-var inputFromFile = File.ReadAllLines(args.Length > 0 ? args[0] : "..\\..\\..\\input.txt").Where(x => x.Trim() != string.Empty);
+const int lineLength = 140;
 
-// A dictionary of mappings for the offset of a letter in a 2D array, given a direction
-Dictionary<LetterDirection, int[]> directionMappings = new Dictionary<LetterDirection, int[]>()
+// Read all lines, stripping out any blank lines
+var inputFromFile = File.ReadAllText(args.Length > 0 ? args[0] : "..\\..\\..\\input.txt").ReplaceLineEndings(string.Empty);
+
+// Mappings for the offset of a letter in a 2D array, given a direction
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+int[] MapDirection(LetterDirection direction)
 {
-    // Arrays of [yOffset, xOffset]
-    { LetterDirection.Up, new []{ -1, 0 } },
-    { LetterDirection.UpRight, new []{ -1, 1 } },
-    { LetterDirection.Right, new []{ 0, 1 } },
-    { LetterDirection.DownRight, new []{ 1, 1 } },
-    { LetterDirection.Down, new []{ 1, 0 } },
-    { LetterDirection.DownLeft, new []{ 1, -1 } },
-    { LetterDirection.Left, new []{ 0, -1 } },
-    { LetterDirection.UpLeft, new []{ -1, -1 } },
-};
+    // Format of [yOffset, xOffset]
+    return direction switch
+    {
+        LetterDirection.Up => [-1, 0],
+        LetterDirection.UpRight => [-1, 1],
+        LetterDirection.Right => [0, 1],
+        LetterDirection.DownRight => [1, 1],
+        LetterDirection.Down => [1, 0],
+        LetterDirection.DownLeft => [1, -1],
+        LetterDirection.Left => [0, -1],
+        LetterDirection.UpLeft => [-1, -1],
+        _ => throw new ArgumentException("Invalid argument"),
+    };
+}
 
 // Gets the value in a grid, given the direction
 // NOTE: This does no bounds checking, it assumes it has been done already
 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-char GetGridValueInDirection(char[][] grid, int xPos, int yPos, LetterDirection direction)
+char GetGridValueInDirection(ReadOnlySpan<char> grid, int xPos, int yPos, LetterDirection direction)
 {
-    return grid[yPos + directionMappings[direction][0]][xPos + directionMappings[direction][1]];
+    int[] directionMappings = MapDirection(direction);
+    return grid[(xPos + directionMappings[1]) + ((yPos + directionMappings[0]) * lineLength)];
+    //return grid[yPos + directionMappings[0]][xPos + directionMappings[1]];
 }
 
 // Gets the letters around the given letter, indicating where they are, with optional restrictions
 // Note: we don't care about binary size, so inline everything for AoCBench performance
 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-Dictionary<LetterDirection, char> GetAdjacentLetters(char[][] grid, int xPos, int yPos, int xSize, int ySize, LetterDirection restrictedDirections)
+//Dictionary<LetterDirection, char> GetAdjacentLetters(char[][] grid, int xPos, int yPos, int xSize, int ySize, LetterDirection restrictedDirections)
+Dictionary<LetterDirection, char> GetAdjacentLetters(ReadOnlySpan<char> grid, int xPos, int yPos, int xSize, int ySize, LetterDirection restrictedDirections)
 {
     // The directions to exclude (ie, at the edges of the grid)
     LetterDirection excludedDirections = LetterDirection.None;
@@ -62,8 +72,8 @@ Dictionary<LetterDirection, char> GetAdjacentLetters(char[][] grid, int xPos, in
 
     // Add each letter to the dictionary, provided it is not excluded by position, and satisfies the restriction
     // Note: "None" is always excluded
-    foreach (LetterDirection direction in 
-        Enum.GetValues<LetterDirection>().Where(x => 
+    foreach (LetterDirection direction in
+        Enum.GetValues<LetterDirection>().Where(x =>
             (restrictedDirections == LetterDirection.None || restrictedDirections.HasFlag(x)) && !excludedDirections.HasFlag(x)))
     {
         adjacentLetters[direction] = GetGridValueInDirection(grid, xPos, yPos, direction);
@@ -78,31 +88,32 @@ void Part1And2()
     long p2Counter = 0;
 
     // Parse out the input into an array of arrays
-    var parsedArray = inputFromFile.Select(x => x.ToCharArray()).ToArray();
+    //var parsedArray = inputFromFile.Select(x => x.ToCharArray()).ToArray();
+    var parsedArray = inputFromFile.AsSpan();
 
     // Go through each letter, and calculate for each part
-    for (int y = 0; y < parsedArray.Length; y++)
+    for (int y = 0; y < lineLength; y++)
     {
-        for (int x = 0; x < parsedArray[y].Length; x++)
+        for (int x = 0; x < lineLength; x++)
         {
             // Part 1 - Does it form an "XMAS" in any direction
-            if (parsedArray[y][x] == 'X')
+            if (parsedArray[x + (y * lineLength)] == 'X')
             {
                 // Get all the adjacent letters to the "X"
-                var lettersAdjacentToX = GetAdjacentLetters(parsedArray, x, y, parsedArray[y].Length, parsedArray.Length, LetterDirection.None);
+                var lettersAdjacentToX = GetAdjacentLetters(parsedArray, x, y, lineLength, lineLength, LetterDirection.None);
 
                 // Any adjacent "M" could form an "XMAS" at this point
                 foreach (var mValue in lettersAdjacentToX.Where(x => x.Value == 'M'))
                 {
                     // Get the direction mapping offsets fir the direction the "M" is in
-                    int[] directionMapping = directionMappings[mValue.Key];
+                    int[] directionMapping = MapDirection(mValue.Key);
 
                     // Find if there is an "A" adjacent to the "M", restricting to the same direction
-                    var aAdjacentToM = GetAdjacentLetters(parsedArray, x + directionMapping[1], y + directionMapping[0], parsedArray[y].Length, parsedArray.Length, mValue.Key).Where(x => x.Value == 'A');
+                    var aAdjacentToM = GetAdjacentLetters(parsedArray, x + directionMapping[1], y + directionMapping[0], lineLength, lineLength, mValue.Key).Where(x => x.Value == 'A');
                     if (aAdjacentToM.Any())
                     {
                         // Find if there is an "S" adjacent to the "A", restricting to the same direction
-                        var sAdjacentToA = GetAdjacentLetters(parsedArray, x + (directionMapping[1] * 2), y + (directionMapping[0] * 2), parsedArray[y].Length, parsedArray.Length, aAdjacentToM.Single().Key).Where(x => x.Value == 'S');
+                        var sAdjacentToA = GetAdjacentLetters(parsedArray, x + (directionMapping[1] * 2), y + (directionMapping[0] * 2), lineLength, lineLength, aAdjacentToM.Single().Key).Where(x => x.Value == 'S');
 
                         // If there is, we have found an "XMAS", so increment the P1 counter
                         if (sAdjacentToA.Any())
@@ -114,10 +125,10 @@ void Part1And2()
             }
 
             // Part 2 - Does it form an "X" of "MAS"es
-            if (parsedArray[y][x] == 'A')
+            if (parsedArray[x + (y * lineLength)] == 'A')
             {
                 // Get the letters around the "A", with a restriction of them being diagonal to it
-                var lettersDiagonallyAdjacentToA = GetAdjacentLetters(parsedArray, x, y, parsedArray[y].Length, parsedArray.Length, LetterDirection.UpRight | LetterDirection.DownRight | LetterDirection.DownLeft | LetterDirection.UpLeft).Select(x => x.Value).ToArray();
+                var lettersDiagonallyAdjacentToA = GetAdjacentLetters(parsedArray, x, y, lineLength, lineLength, LetterDirection.UpRight | LetterDirection.DownRight | LetterDirection.DownLeft | LetterDirection.UpLeft).Select(x => x.Value).ToArray();
                 if (lettersDiagonallyAdjacentToA.Length == 4) // We have an "X", now check it is a "MAS"
                 {
                     // As we can assume that our dict values are ordered clockwise (as they are specified to be in the enum),

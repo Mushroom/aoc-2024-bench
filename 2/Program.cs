@@ -1,5 +1,5 @@
 ﻿// Read all lines, stripping out any blank lines
-var inputFromFile = File.ReadAllLines("input.txt").Where(x => x.Trim() != string.Empty);
+var inputFromFile = File.ReadAllLines(args.Length > 0 ? args[0] : "..\\..\\..\\input.txt").Where(x => x.Trim() != string.Empty);
 
 // Checks if a report is considered valid
 bool IsValid(List<int> reportLevels)

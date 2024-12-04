@@ -15,7 +15,7 @@ internal partial class Program
     private static void Main(string[] args)
     {
         // Read all text, stripping blank lines from the end
-        var inputFromFile = File.ReadAllText("input.txt").TrimEnd();
+        var inputFromFile = File.ReadAllText(args.Length > 0 ? args[0] : "..\\..\\..\\input.txt").TrimEnd();
 
         // Do both parts at the same time for efficiency
         Part1And2(inputFromFile);

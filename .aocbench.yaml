@@ -7,5 +7,5 @@ workdir: "/code/%day%"
 runonce: dotnet publish -o publish_dir -c Release
 cmd: publish_dir/Day%day% %input%
 daypath: "%day%"
-inputfile: ../aoc-2024-bench-data/%day%/input.txt
-answerfile: ../aoc-2024-bench-data/%day%/answers.txt
+inputfile: aoc-2024-bench-data/%day%/input.txt
+answerfile: aoc-2024-bench-data/%day%/answers.txt

@@ -3,3 +3,5 @@ obj/
 publish_dir/
 *.sln
 .vscode/
+input.txt
+answers.txt

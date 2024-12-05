@@ -8,7 +8,7 @@ var inputFromFile = File.ReadAllLines(args.Length > 0 ? args[0] : "..\\..\\..\\i
 var orderingRules = inputFromFile.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).Select(y => Array.ConvertAll(y.Split('|'), int.Parse));
 
 // Group them by the first half of the rule (Part 1)
-var orderingRulesBefore = orderingRules.GroupBy(z => z[0]);
+var orderingRulesBefore = orderingRules.GroupBy(z => z[0]).ToList();
 
 // Parse out the page numbers
 var pageNumbers = inputFromFile.SkipWhile(x => !string.IsNullOrWhiteSpace(x)).Skip(1).Select(y => Array.ConvertAll(y.Split(','), int.Parse));

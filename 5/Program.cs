@@ -7,9 +7,10 @@ var inputFromFile = File.ReadAllLines(args.Length > 0 ? args[0] : "..\\..\\..\\i
 // Parse out the rules into int[2] arrays
 var orderingRules = inputFromFile.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).Select(y => Array.ConvertAll(y.Split('|'), int.Parse));
 
+// Pre-compute what would otherwise be very slow "GroupBy" operations
+// Note: This gives a 4x perf increase compared to "GroupBy"
 Dictionary<int, List<int>> beforeOrderingRules = new Dictionary<int, List<int>>(100);
 Dictionary<int, List<int>> afterOrderingRules = new Dictionary<int, List<int>>(100);
-
 foreach(var orderingRule in orderingRules)
 {
     if(!beforeOrderingRules.ContainsKey(orderingRule[0]))
@@ -28,9 +29,6 @@ foreach(var orderingRule in orderingRules)
     afterOrderingRules[orderingRule[1]].Add(orderingRule[0]);
 }
 
-// Group them by the first half of the rule (Part 1)
-//var orderingRulesBefore = orderingRules.GroupBy(z => z[0]).ToList();
-
 // Parse out the page numbers
 var pageNumbers = inputFromFile.Skip(orderingRules.Count() + 1).Select(y => Array.ConvertAll(y.Split(','), int.Parse)).ToArray();
 
@@ -43,7 +41,6 @@ bool ArePagesInOrder(Span<int> pages)
     for (int i = 0; i < pages.Length; i++)
     {
         // Find the relevant rules (first-element grouped) for this page number
-        //var rulesForThisNumber = beforeOrderingRules.Where(x => x.Key == pages[i]);
         if (beforeOrderingRules.ContainsKey(pages[i]))
         {
             // Look back at previous pages to see if they violate the rules
@@ -80,7 +77,6 @@ void Part1And2()
             // You don't actually need to order it - for all possible valid rules for this number set, when grouped by the second number in the rule - 
             // the group with the same number of rules as the index of the middle value of the array, matches the correct middle number
             var validSecondNoGroups = afterOrderingRules.Select(x => (x.Key, x.Value.Where(y => pageNumberSet.Contains(y)).ToArray())).Where(x => pageNumberSet.Contains(x.Item1) && x.Item2.Length > 0).ToArray();
-            //p2Counter += .First(w => w.Count() == pageNumberSet.Length / 2).Key;
             foreach(var validGroup in validSecondNoGroups)
             {
                 if(validGroup.Item2.Count() == pageNumberSet.Length / 2)

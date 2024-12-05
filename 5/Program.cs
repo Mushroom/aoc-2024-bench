@@ -11,7 +11,7 @@ var orderingRules = inputFromFile.TakeWhile(x => !string.IsNullOrWhiteSpace(x)).
 var orderingRulesBefore = orderingRules.GroupBy(z => z[0]).ToList();
 
 // Parse out the page numbers
-var pageNumbers = inputFromFile.SkipWhile(x => !string.IsNullOrWhiteSpace(x)).Skip(1).Select(y => Array.ConvertAll(y.Split(','), int.Parse));
+var pageNumbers = inputFromFile.Skip(orderingRules.Count() + 1).Select(y => Array.ConvertAll(y.Split(','), int.Parse)).ToArray();
 
 // Checks if pages are in order
 // Note: We don't care about binary size or compilation time for AoCbench, so force inlining
@@ -58,7 +58,16 @@ void Part1And2()
             // This is a really interesting property of the data/rules I noticed while debugging that results in a ridiculous (and likely unintended) perf win:
             // You don't actually need to order it - for all possible valid rules for this number set, when grouped by the second number in the rule - 
             // the group with the same number of rules as the index of the middle value of the array, matches the correct middle number
-            p2Counter += orderingRules.Where(x => x.All(y => pageNumberSet.Contains(y))).GroupBy(z => z[1]).Single(w => w.Count() == pageNumberSet.Length / 2).Key;
+            var validSecondNoGroups = orderingRules.Where(x => pageNumberSet.Contains(x[0]) && pageNumberSet.Contains(x[1])).GroupBy(z => z[1]);
+            //p2Counter += .First(w => w.Count() == pageNumberSet.Length / 2).Key;
+            foreach(var validGroup in validSecondNoGroups)
+            {
+                if(validGroup.Count() == pageNumberSet.Length / 2)
+                {
+                    p2Counter += validGroup.Key;
+                    break;
+                }
+            }
         }
     }
 

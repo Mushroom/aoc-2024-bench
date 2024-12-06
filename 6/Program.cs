@@ -127,23 +127,26 @@ char[]? PlotGuardPathWithLoops(int[] guardStartingPosition)
     }
 }
 
-void Part1(int[] guardStartingPos)
+void Part1And2(int[] guardStartingPos)
 {
-    // Find the guard and plot their path, and sum all visited tiles
-    var sum = PlotGuardPathWithLoops(guardStartingPos)!.Count(y => y > 0b000 && y <= 0b1111);
-    Console.WriteLine(sum);
-}
+    // Plot out the guards base path with no modifications
+    var plottedPathBase = PlotGuardPathWithLoops(guardStartingPos)!;
 
-void Part2(int[] guardStartingPos)
-{
+    // Part 1 - count the visited tiles
+    var sum = plottedPathBase.Count(y => y != 0);
+    Console.WriteLine(sum);
+
+    // Part 2 - check if any objects in the way cause loops
     long loopCount = 0;
 
     for (int y = 0; y < gridSize; y++)
     {
         for (int x = 0; x < gridSize; x++)
         {
-            if (grid[x + (y * gridSize)] == '#' || grid[x + (y * gridSize)] == '^') continue;
+            // We only need to check for loops if an object is placed on the original path (and isn't the start position)
+            if (plottedPathBase[x + (y * gridSize)] == '\0' || grid[x + (y * gridSize)] == '^') continue;
 
+            // Place an obstruction and see if it creates any loops
             grid[x + (y * gridSize)] = '#';
             if (PlotGuardPathWithLoops(guardStartingPos) == null) loopCount++;
             grid[x + (y * gridSize)] = '.';
@@ -154,5 +157,4 @@ void Part2(int[] guardStartingPos)
 }
 
 int[] guardStartPos = FindGuard();
-Part1(guardStartPos);
-Part2(guardStartPos);
+Part1And2(guardStartPos);

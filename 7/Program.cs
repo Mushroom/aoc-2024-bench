@@ -11,6 +11,9 @@ bool IsSumValid(long requiredTotal, Span<long> values, bool concat)
     long lastValue = values[values.Length - 1];
     if(values.Length == 1) return values[0] == requiredTotal;
 
+    // Also return early is required total is less than zero, as this means it is invalid
+    if(requiredTotal < 0) return false;
+
     // If the division of the total by the last value results in an integer, recursively check the array without the last number
     if(requiredTotal % lastValue == 0 && IsSumValid(requiredTotal/lastValue, values[..^1], concat))
     {

@@ -5,3 +5,4 @@ publish_dir/
 .vscode/
 input.txt
 answers.txt
+.vs/

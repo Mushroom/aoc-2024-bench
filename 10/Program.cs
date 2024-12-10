@@ -1,6 +1,6 @@
 ﻿// Read all lines form the input file
 var inputFromFile = File.ReadAllLines(args.Length > 0 ? args[0] : "..\\..\\..\\input.txt").Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-const int lineLength = 57;
+int lineLength = inputFromFile.Length + 2;
 
 // Create the 1D input array, padding the data
 var inputArray = new string('X', lineLength) + string.Concat(inputFromFile.SelectMany(x => 'X' + x + 'X')) + new string('X', lineLength);

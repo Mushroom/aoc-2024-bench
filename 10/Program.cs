@@ -6,7 +6,7 @@ int lineLength = inputFromFile.Length + 2;
 var inputArray = new string('X', lineLength) + string.Concat(inputFromFile.SelectMany(x => 'X' + x + 'X')) + new string('X', lineLength);
 
 // Gets the number of paths for the given position
-int GetPathCount(ReadOnlySpan<char> inputSpan, int y, int x, bool[] visitedNines)
+int GetPathCount(ReadOnlySpan<char> inputSpan, int y, int x, Span<bool> visitedNines)
 {
     // We've hit the end of the path
     if (inputSpan[x + (y * lineLength)] == '9')
@@ -41,7 +41,7 @@ void Part1And2()
     var inputSpan = inputArray.AsSpan();
     long totalP1 = 0;
     long totalP2 = 0;
-    bool[] visitedNines = new bool[inputArray.Length];
+    Span<bool> visitedNines = new bool[inputArray.Length * inputArray.Length];
 
     // Scan through the padded array
     for (int y = 1; y < lineLength - 1; y++)
@@ -51,11 +51,11 @@ void Part1And2()
             // We have found the start of a trail
             if (inputSpan[x + (y * lineLength)] == '0')
             {
+                Span<bool> ninesSlice = visitedNines.Slice((x + (y * lineLength)) * inputArray.Length, inputArray.Length);
                 // Get the number of paths (P2)
-                totalP2 += GetPathCount(inputSpan, y, x, visitedNines);
-                // Count the number of nines we visited, record it, then clear the array
-                totalP1 += visitedNines.Count(x => x);
-                Array.Clear(visitedNines);
+                totalP2 += GetPathCount(inputSpan, y, x, ninesSlice);
+                // Count the number of nines we visited, and add to the total
+                totalP1 += ninesSlice.Count(true);
             }
         }
     }

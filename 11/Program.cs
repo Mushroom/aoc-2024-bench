@@ -52,7 +52,7 @@ Tuple<long, long> PerformRulesOnList()
         }
 
         // Part 1
-        if(i == 25)
+        if(i == 24)
         {
             p1Count = stoneTracker.Values.Sum();
         }

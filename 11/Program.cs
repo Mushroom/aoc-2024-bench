@@ -5,7 +5,8 @@ var inputFromFile = File.ReadAllText(args.Length > 0 ? args[0] : "..\\..\\..\\in
 var stoneList = inputFromFile.Split(' ').Select(x => long.Parse(x)).ToList();
 
 // Initialise the dictionary that keeps track of how many stones of each number there are
-Dictionary<long, long> stoneTracker = new Dictionary<long, long>();
+// Note: We pre-allocate 4500 entries, which from testing should avoid resizing
+Dictionary<long, long> stoneTracker = new Dictionary<long, long>(4500);
 
 // Does the rules for the required number of iterations on the stones
 Tuple<long, long> PerformRulesOnList()

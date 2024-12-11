@@ -20,7 +20,6 @@ Tuple<long, long> PerformRulesOnList()
     {
         // Loop through each stone value
         // Note: We convert to list here, as it creates a copy - this is needed as we will be modifying the dictionary
-        var debugList = stoneTracker.Where(x => x.Value > 0).ToList();
         foreach(var stoneCounter in stoneTracker.ToList())
         {
             // If there are no stones with this value, then don't do anything with it

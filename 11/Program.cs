@@ -57,32 +57,6 @@ Tuple<long, long> PerformRulesOnList()
         {
             p1Count = stoneTracker.Values.Sum();
         }
-
-        /*for (int j = 0; j < stoneList.Count; j++)
-        {
-            // Rule 1 - Stones engraved with '0' become '1'
-            if (stoneList[j] == 0)
-            {
-                stoneList[j] = 1;
-                continue;
-            }
-
-            // Rule 2 - Split a stone with an even number of digits
-            string stoneString = stoneList[j].ToString();
-            if(stoneString.Length % 2 == 0)
-            {
-                var leftHalf = long.Parse(stoneString[..(stoneString.Length / 2)]);
-                var rightHalf = long.Parse(stoneString[(stoneString.Length / 2)..]);
-                stoneList[j] = rightHalf;
-                stonesToAdd.Add(leftHalf);
-                continue;
-            }
-
-            // Rule 3 - Otherwise, multiply by 2024
-            stoneList[j] *= 2024;
-        }
-
-        stoneList.AddRange(stonesToAdd);*/
     }
 
     return new(p1Count, stoneTracker.Values.Sum());

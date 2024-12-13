@@ -6,11 +6,11 @@ var machines = new ClawMachine[inputFromFile.Length / 3];
 // Loop through all the input and parse it into machines
 for(int i = 2; i < inputFromFile.Length; i+=3)
 {
-    // Parse out each number into a pair of arrays, that then go into the list as a ClawMachine object
-    var buttonA = inputFromFile[i-2][10..].Split(", ").Select(x => long.Parse(x[2..])).ToArray();
-    var buttonB = inputFromFile[i-1][10..].Split(", ").Select(x => long.Parse(x[2..])).ToArray();
-    var prize = inputFromFile[i][7..].Split(", ").Select(x => long.Parse(x[2..])).ToArray();
-    machines[i / 3] = new (buttonA[0], buttonA[1], buttonB[0], buttonB[1], prize[0], prize[1]);
+    // Parse out each button into a pair of strings, that then go into the list as a ClawMachine object
+    var buttonA = inputFromFile[i-2][10..].Split(", ");
+    var buttonB = inputFromFile[i-1][10..].Split(", ");
+    var prize = inputFromFile[i][7..].Split(", ");
+    machines[i / 3] = new (long.Parse(buttonA[0][2..]), long.Parse(buttonA[1][2..]), long.Parse(buttonB[0][2..]), long.Parse(buttonB[1][2..]), long.Parse(prize[0][2..]), long.Parse(prize[1][2..]));
 }
 
 long SolveUsingCramersRule(bool withOffset)

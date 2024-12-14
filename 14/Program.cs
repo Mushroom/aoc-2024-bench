@@ -45,7 +45,7 @@ void Part1And2(List<Tuple<int, Robot>> initialMap)
 
         // Part 2: Check if all robots are in unique positions
         var groupedInput = newMap.GroupBy(x => x.Item1);
-        if (groupedInput.All(y => y.Count() == 1))
+        if (groupedInput.Count() == inputFromFile.Length)
         {
             // If they are, find a run of at least 10 sequential values (this indicates a chirstmas tree)
             var groupedInputOrdered = groupedInput.OrderBy(x => x.Key);
